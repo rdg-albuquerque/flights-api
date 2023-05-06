@@ -13,4 +13,4 @@ app.get('/importAirports', importAirports)
 app.get('/search/:departure_airport/:arrival_airport/:outbound_date/:inbound_date?', searchFlights)
 
 
-app.listen(process.env.PORT | 8001) 
+app.listen(process.env.PORT || 8001) 
