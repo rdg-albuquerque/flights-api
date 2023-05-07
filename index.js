@@ -12,5 +12,6 @@ app.get('/importAirports', importAirports)
 
 app.get('/search/:departure_airport/:arrival_airport/:outbound_date/:inbound_date?', searchFlights)
 
+console.log('Running at test branch')
 
 app.listen(process.env.PORT || 8001) 
