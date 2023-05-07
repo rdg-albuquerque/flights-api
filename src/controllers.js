@@ -78,11 +78,11 @@ const importAirports = async (req, res) => {
                 }
             }
 
-            return res.status(201).json({message: 'Database has been updated'})
+            res.status(201).json({message: 'Database has been updated'})
         }    
     } catch (error) {
         if (error.name === 'AxiosError' && error.response.statusText === 'Unauthorized') {
-            res.json({message: 'Username or password are invalid for third party API'})
+            return res.json({message: 'Username or password are invalid for third party API'})
         }
         res.status(400).json({message: error})
     }
@@ -94,7 +94,7 @@ const searchFlights = async (req, res) => {
     try {
         /* VALIDATIONS */
         if (!departure_airport || !arrival_airport || !outbound_date) {
-            res.status(400).json({message: 'Please make sure you provided all parameters'})
+            return res.status(400).json({message: 'Please make sure you provided all parameters'})
         }
     
         const {rows: dbAirports} = await query('Select iata from airports where iata IN ($1, $2)', [departure_airport, arrival_airport])
@@ -102,15 +102,15 @@ const searchFlights = async (req, res) => {
         const iatasFounded = dbAirports.map(airport => airport.iata)
     
         if (!iatasFounded.includes(departure_airport)) {
-            res.status(400).json({message: 'Departure airport is not available'})
+            return res.status(400).json({message: 'Departure airport is not available'})
         }
     
         if (!iatasFounded.includes(arrival_airport)) {
-            res.status(400).json({message: 'Arrival airport is not available'})
+            return res.status(400).json({message: 'Arrival airport is not available'})
         }
     
         if (departure_airport === arrival_airport) {
-            res.status(400).json({message: 'Departure airport should not be the same as arrival airport'})
+            return res.status(400).json({message: 'Departure airport should not be the same as arrival airport'})
         }
     
     
@@ -118,21 +118,21 @@ const searchFlights = async (req, res) => {
         const inboundTimestamp = Date.parse(inbound_date)
     
         if (outbound_date.length !== 10 || Number.isNaN(outboundTimestamp)) {
-            res.status(400).json({message: 'Not a valid outbound date'})
+            return res.status(400).json({message: 'Not a valid outbound date'})
         }
         if (inbound_date && (inbound_date.length !== 10 || Number.isNaN(inboundTimestamp))) {
-            res.status(400).json({message: 'Not a valid inbound date'})
+            return res.status(400).json({message: 'Not a valid inbound date'})
         }
     
         const now = new Date()
         var todayString = `${now.getFullYear()}-${now.getMonth().toString().padStart(2, 0)}-${now.getDay().toString().padStart(2, 0)}`
     
         if (outboundTimestamp < Date.parse(todayString)) {
-            res.status(400).json({message: "Outbound date should not be less than today's date"})
+            return res.status(400).json({message: "Outbound date should not be less than today's date"})
         }
     
         if (inboundTimestamp && inboundTimestamp < outboundTimestamp) {
-            res.status(400).json({message: 'Outbound date should not be greater than inbound date'})
+            return res.status(400).json({message: 'Outbound date should not be greater than inbound date'})
         }
     
         /* END OF VALIDATIONS */
