@@ -13,6 +13,17 @@ const to2decimals = (value) => {
 
 /**
  * 
+ * @param {string} iata 
+ * @returns {boolean} Whether informed iata is valid or not 
+ */
+const isValidIata = (iata) => {
+    const regex = /^[A-Z]{3}$/
+
+    return regex.test(iata)
+}
+
+/**
+ * 
  * @param {string} dateString 
  * @returns {boolean} Return if date is a YYYY-MM-DD format or not
  */
@@ -81,6 +92,7 @@ const calculateCost = (price, distance) => {
 
 module.exports = {
     to2decimals,
+    isValidIata,
     isValidDate,
     calculateDistance,
     calculateSpeed,
