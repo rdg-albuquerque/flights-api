@@ -81,10 +81,24 @@ const importAirports = async (req, res) => {
             res.status(201).json({message: 'Database has been updated'})
         }    
     } catch (error) {
-        if (error.name === 'AxiosError' && error.response.statusText === 'Unauthorized') {
-            return res.status(500).json({message: 'Username or password are invalid for third party API'})
+        if (error.name === "AxiosError") {
+            return res.status(500).json({message: error.response.data.error})
         }
-        res.status(500).json({message: error})
+        res.status(500).json({message: error.message})
+    }
+}
+
+const getAirports = async (req, res) => {
+    try {
+        const {rowCount, rows: dbAirports} = await query('Select * from airports')
+
+        if (rowCount === 0) {
+            return res.status(400).json({message: 'Airports database is empty!'})
+        }
+
+        res.json(dbAirports)
+    } catch (error) {
+        res.status(500).json({message: error.message})
     }
 }
 
@@ -287,6 +301,7 @@ const searchFlights = async (req, res) => {
 
 module.exports = {
     importAirports,
+    getAirports,
     updateAirportStatus,
     searchFlights
 }

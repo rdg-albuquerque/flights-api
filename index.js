@@ -1,7 +1,7 @@
 const express = require('express')
 require('dotenv').config()
 const { checkAuth } = require('./src/mid')
-const { importAirports, searchFlights, updateAirportStatus } = require('./src/controllers')
+const { importAirports, searchFlights, updateAirportStatus, getAirports } = require('./src/controllers')
 
 const app = express()
 app.use(express.json())
@@ -9,6 +9,8 @@ app.use(express.json())
 app.use(checkAuth)
 
 app.get('/importAirports', importAirports)
+
+app.get('/getAirports', getAirports)
 
 app.patch('/airportStatus/:iata', updateAirportStatus)
 
