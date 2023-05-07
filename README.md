@@ -20,6 +20,7 @@ Example request: `https://flights-api.herokuapp.com/importAirports`
 	- Must be a boolean type sent in the body(JSON)
 
 Example request: `https://flights-api.herokuapp.com/airportStatus/AAX`
+
 Example body: `{"active" : true }`
 
 <b>[GET] /search/:departure_airport/:arrival_airport/:outbound_date/:inbound_date?</b> &rarr; Returns flight options based on the informed params
