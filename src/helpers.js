@@ -13,6 +13,16 @@ const to2decimals = (value) => {
 
 /**
  * 
+ * @param {string} dateString 
+ * @returns {boolean} Return if date is a YYYY-MM-DD format or not
+ */
+const isValidDate = (dateString) => {
+    const regex = /^(?!0000)[0-9]{4}-(0?[1-9]|1[0-2])-(0?[1-9]|[1-2][0-9]|3[0-1])$/
+    return regex.test(dateString)
+}
+
+/**
+ * 
  * @param {number} lat1 Latitude location A
  * @param {number} lon1 Longitude location A
  * @param {number} lat2 Latitude location B
@@ -24,18 +34,18 @@ const calculateDistance = (lat1, lon1, lat2, lon2) => {
         throw new Error('Make sure the coordinates are correct')
     }
 
-    const earthRadius = 6371; // average radius of Earth in kilometers
+    const earthRadius = 6371 // average radius of Earth in kilometers
 
-    const latDistance = (lat2 - lat1) * Math.PI / 180; // difference in latitude in radians
-    const lonDistance = (lon2 - lon1) * Math.PI / 180; // difference in longitude in radians
+    const latDistance = (lat2 - lat1) * Math.PI / 180 // difference in latitude in radians
+    const lonDistance = (lon2 - lon1) * Math.PI / 180 // difference in longitude in radians
 
     const arcsin = Math.sin(latDistance / 2) * Math.sin(latDistance / 2) +
             Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-            Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2);
+            Math.sin(lonDistance / 2) * Math.sin(lonDistance / 2)
 
-    const c = 2 * Math.atan2(Math.sqrt(arcsin), Math.sqrt(1 - arcsin)); // angle between the points in radians
+    const c = 2 * Math.atan2(Math.sqrt(arcsin), Math.sqrt(1 - arcsin)) // angle between the points in radians
 
-    const distance = earthRadius * c; // distance in kilometers
+    const distance = earthRadius * c // distance in kilometers
 
     return distance
 }
@@ -71,6 +81,7 @@ const calculateCost = (price, distance) => {
 
 module.exports = {
     to2decimals,
+    isValidDate,
     calculateDistance,
     calculateSpeed,
     calculateCost

@@ -1,8 +1,8 @@
 
 const axios = require('axios').default
-const format = require('pg-format');
+const format = require('pg-format')
 const query = require('../db')
-const {to2decimals, calculateDistance, calculateSpeed, calculateCost} = require('./helpers')
+const {to2decimals, calculateDistance, calculateSpeed, calculateCost, isValidDate} = require('./helpers')
 
 const importAirports = async (req, res) => {
     try {
@@ -112,20 +112,20 @@ const searchFlights = async (req, res) => {
         if (departure_airport === arrival_airport) {
             return res.status(400).json({message: 'Departure airport should not be the same as arrival airport'})
         }
-    
-    
-        const outboundTimestamp = Date.parse(outbound_date)
-        const inboundTimestamp = Date.parse(inbound_date)
-    
-        if (outbound_date.length !== 10 || Number.isNaN(outboundTimestamp)) {
-            return res.status(400).json({message: 'Not a valid outbound date'})
+
+        if (!isValidDate(outbound_date)) {
+            return res.status(400).json({message: "Invalid outbound date. Please use a valid date in the format 'YYYY-MM-DD'"})
         }
-        if (inbound_date && (inbound_date.length !== 10 || Number.isNaN(inboundTimestamp))) {
-            return res.status(400).json({message: 'Not a valid inbound date'})
+
+        if (inbound_date && !isValidDate(inbound_date)) {
+            return res.status(400).json({message: "Invalid inbound date. Please use a valid date in the format 'YYYY-MM-DD'"})
         }
     
         const now = new Date()
         var todayString = `${now.getFullYear()}-${now.getMonth().toString().padStart(2, 0)}-${now.getDay().toString().padStart(2, 0)}`
+
+        const outboundTimestamp = new Date(outbound_date).getTime()
+        const inboundTimestamp = new Date(inbound_date).getTime()
     
         if (outboundTimestamp < Date.parse(todayString)) {
             return res.status(400).json({message: "Outbound date should not be less than today's date"})
@@ -244,7 +244,10 @@ const searchFlights = async (req, res) => {
     
         res.json(flights)
     } catch (error) {
-        res.status(400).json(error.message)
+        if (error.name === "AxiosError") {
+            return res.status(400).json({message: error.response.data.error})
+        }
+        res.status(400).json({message: error.message})
     }
 }
 
