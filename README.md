@@ -14,6 +14,10 @@ Steps to run the project locally:
 	
 Example request: `https://flights-api.herokuapp.com/importAirports`
 
+<b>[GET] /getAirports </b> &rarr; Returns a list of all airports in database
+	
+Example request: `https://flights-api.herokuapp.com/getAirports`
+
 <b>[PATCH] /airportStatus/:iata: </b> &rarr; Update the active status for certain airport
 - iata - Airport's iata
 - active - New desirable status for the airport
