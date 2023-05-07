@@ -2,7 +2,7 @@
 const axios = require('axios').default
 const format = require('pg-format')
 const query = require('../db')
-const {to2decimals, calculateDistance, calculateSpeed, calculateCost, isValidDate} = require('./helpers')
+const {to2decimals, calculateDistance, calculateSpeed, calculateCost, isValidDate, isValidIata} = require('./helpers')
 
 const importAirports = async (req, res) => {
     try {
@@ -82,10 +82,36 @@ const importAirports = async (req, res) => {
         }    
     } catch (error) {
         if (error.name === 'AxiosError' && error.response.statusText === 'Unauthorized') {
-            return res.json({message: 'Username or password are invalid for third party API'})
+            return res.status(500).json({message: 'Username or password are invalid for third party API'})
         }
-        res.status(400).json({message: error})
+        res.status(500).json({message: error})
     }
+}
+
+const updateAirportStatus = async (req, res) => {
+    var {iata} = req.params
+    var {active} = req.body
+
+    if (!isValidIata(iata)) {
+        return res.status(400).json({message: 'Iata parameter is not in a valid format'})
+    }
+
+    if (!active) {
+        return res.status(400).json({message: 'Status parameter for airport is required'})
+    }
+
+    try {
+        const {rowCount} = await query('Update airports set active = $1 where iata = $2', [active, iata])
+
+        if (rowCount === 0) {
+            return res.status(400).json({message: 'Check if the informed iata is a valid iata'})
+        }
+
+        res.json({message: 'Airport status updated sucessfully'})
+    } catch (error) {
+        res.status(500).json({message: 'Something went wrong while trying to update airport status'})
+    }
+
 }
 
 const searchFlights = async (req, res) => {
@@ -96,17 +122,25 @@ const searchFlights = async (req, res) => {
         if (!departure_airport || !arrival_airport || !outbound_date) {
             return res.status(400).json({message: 'Please make sure you provided all parameters'})
         }
+
+        if (!isValidIata(departure_airport)) {
+            return res.status(400).json({message: 'Departure airport iata is not in a valid format'})
+        }
+
+        if (!isValidIata(arrival_airport)) {
+            return res.status(400).json({message: 'Arrival airport iata is not in a valid format'})
+        }
     
         const {rows: dbAirports} = await query('Select iata from airports where iata IN ($1, $2)', [departure_airport, arrival_airport])
     
         const iatasFounded = dbAirports.map(airport => airport.iata)
     
         if (!iatasFounded.includes(departure_airport)) {
-            return res.status(400).json({message: 'Departure airport is not available'})
+            return res.status(400).json({message: 'Departure airport is not available or does not exists'})
         }
     
         if (!iatasFounded.includes(arrival_airport)) {
-            return res.status(400).json({message: 'Arrival airport is not available'})
+            return res.status(400).json({message: 'Arrival airport is not available or does not exists'})
         }
     
         if (departure_airport === arrival_airport) {
@@ -245,13 +279,14 @@ const searchFlights = async (req, res) => {
         res.json(flights)
     } catch (error) {
         if (error.name === "AxiosError") {
-            return res.status(400).json({message: error.response.data.error})
+            return res.status(500).json({message: error.response.data.error})
         }
-        res.status(400).json({message: error.message})
+        res.status(500).json({message: error.message})
     }
 }
 
 module.exports = {
     importAirports,
+    updateAirportStatus,
     searchFlights
 }
