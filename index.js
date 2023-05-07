@@ -6,7 +6,7 @@ const { importAirports, searchFlights } = require('./src/controllers')
 const app = express()
 app.use(express.json())
 
-app.use(checkAuth)
+// app.use(checkAuth)
 
 app.get('/importAirports', importAirports)
 
