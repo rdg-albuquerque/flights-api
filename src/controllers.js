@@ -96,8 +96,8 @@ const updateAirportStatus = async (req, res) => {
         return res.status(400).json({message: 'Iata parameter is not in a valid format'})
     }
 
-    if (!active) {
-        return res.status(400).json({message: 'Status parameter for airport is required'})
+    if (active === null || active === undefined) {
+        return res.status(400).json({message: 'Active body parameter for airport is required'})
     }
 
     try {
@@ -156,7 +156,7 @@ const searchFlights = async (req, res) => {
         }
     
         const now = new Date()
-        var todayString = `${now.getFullYear()}-${now.getMonth().toString().padStart(2, 0)}-${now.getDay().toString().padStart(2, 0)}`
+        var todayString = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, 0)}-${now.getDate().toString().padStart(2, 0)}`
 
         const outboundTimestamp = new Date(outbound_date).getTime()
         const inboundTimestamp = new Date(inbound_date).getTime()
