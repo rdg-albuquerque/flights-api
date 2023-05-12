@@ -104,7 +104,7 @@ const getAirports = async (req, res) => {
 
 const updateAirportStatus = async (req, res) => {
     var {iata} = req.params
-    var {active} = req.body
+    var {active, info} = req.body
 
     if (!isValidIata(iata)) {
         return res.status(400).json({message: 'Iata parameter is not in a valid format'})
@@ -115,7 +115,7 @@ const updateAirportStatus = async (req, res) => {
     }
 
     try {
-        const {rowCount} = await query('Update airports set active = $1 where iata = $2', [active, iata])
+        const {rowCount} = await query('Update airports set active = $1, info = $2 where iata = $3', [active, info || null, iata])
 
         if (rowCount === 0) {
             return res.status(400).json({message: 'Check if the informed iata is a valid iata'})

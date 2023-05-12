@@ -10,3 +10,5 @@ CREATE TABLE AIRPORTS (
   state text not null,
   active boolean default true
 );
+
+alter table airports add column info text;
